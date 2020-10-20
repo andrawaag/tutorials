@@ -1,1 +1,1 @@
-web: voila —-port=$PORT —-no-browser resolveID.ipynb
+web: voila —-port=$PORT —-no-browser 
