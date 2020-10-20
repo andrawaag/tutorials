@@ -1,4 +1,3 @@
-setuptools~=50.3.0
+jupyterlab
 voila
-wikidataintegrator~=0.7.4
-Flask~=1.1.2
+wikidataintegrator
