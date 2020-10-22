@@ -1,1 +1,1 @@
-web: voila --port=$PORT --no-browser resolveID.ipynb
+web: voila --port=$PORT --no-browser BioCuration_Breakout1.ipynb
