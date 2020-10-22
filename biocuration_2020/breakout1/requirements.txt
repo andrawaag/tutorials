@@ -1,0 +1,4 @@
+jupyterlab
+voila
+wikidataintegrator
+ipywidgets
