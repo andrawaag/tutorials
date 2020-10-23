@@ -4,7 +4,43 @@ import ipywidgets as widgets
 from ipywidgets import interact, interactive
 from IPython.display import IFrame, clear_output
 
-def task1():
+def task1(df, label):
+    # Download
+    url = "https://raw.githubusercontent.com/DiseaseOntology/SymptomOntology/main/symp.owl"
+    label.value = "\nDownloading the Symptom Ontology..."
+    # Parse owl file into a graph object
+    symptomGraph = Graph()
+    symptomGraph.parse(url, format="xml")
+
+    qres = symptomGraph.query(
+    """
+       PREFIX obo: <http://www.geneontology.org/formats/oboInOwl#>
+       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+       PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
+
+       SELECT DISTINCT ?so_uri ?soid ?label (GROUP_CONCAT(?subClassOf;separator="|") as ?subclasses)
+                                            (GROUP_CONCAT(?exactsynonym;separator="|") as ?exact_synonyms)
+       WHERE {
+        ?so_uri obo:id ?soid ;
+                  rdfs:label ?label .
+        FILTER NOT EXISTS {?so_uri owl:deprecated true}
+         OPTIONAL {?so_uri rdfs:subClassOf ?subClassOf ;}
+         OPTIONAL {?so_uri oboInOwl:hasExactSynonym ?exactsynonym}
+       }
+       GROUP BY ?so_uri """)
+
+    for row in qres:
+        df = df.append({
+         "so_uri": str(row[0]),
+         "soid": str(row[1]),
+         "label":  str(row[2]),
+         "subclassof": str(row[3]),
+         "aliases": str(row[4])
+          }, ignore_index=True)
+    label.value = ""
+    return df
+
+def task1a():
     soDownloadButton = widgets.Button(description="Download Symptom ontology")
     label = widgets.Label(description="")
     so = widgets.Output()
@@ -51,7 +87,7 @@ def task1():
         with so:    
             display(df)
             
-def task2():
+def task2(df):
     @interact
     def browse(symptom=df["label"].tolist()):
         symptomrow = df[df["label"]==symptom].T
